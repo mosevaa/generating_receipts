@@ -11,6 +11,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from rest_framework.views import APIView
 
 from generating_app.models import Item
+from generating_app import errors
 
 
 def generate_pdf(items_from_db, counts):
@@ -51,12 +52,18 @@ class ItemView(APIView):
     def post(self, request):
         base_url = "{0}://{1}/".format(request.scheme, request.get_host())
 
+        if 'items' not in request.data.keys() or type(request.data['items']) is not list or len(request.data.keys()) > 1:
+            raise errors.BadRequest
+
         counts = {}
-        for item_id in request.data['item']:
+        for item_id in request.data['items']:
             if item_id not in counts.keys():
                 counts[item_id] = 0
             counts[item_id] += 1
-        items_from_db = Item.objects.filter(id__in=request.data['item'])
+        items_from_db = Item.objects.filter(id__in=request.data['items'])
+
+        if len(items_from_db) == 0:
+            raise errors.ItemsNotFound
 
         path = generate_pdf(items_from_db, counts)
 
