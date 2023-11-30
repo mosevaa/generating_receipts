@@ -1,3 +1,4 @@
+import os
 import jinja2
 import pdfkit
 import qrcode
@@ -34,6 +35,10 @@ def generate_pdf(items_from_db, counts):
         date=datetime.now().strftime("%d.%m.%Y %H:%M"),
         full_price=full_price
     )
+    path = "media"
+    if not os.path.exists(path):
+        os.mkdir(path)
+
     output_path = f'media/{int(datetime.now().timestamp())}.pdf'
     pdfkit.from_string(rendered_page,
                        output_path=output_path,
