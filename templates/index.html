@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <table class="body-wrap">
+    <tbody><tr>
+        <td></td>
+        <td class="container" width="600">
+            <div class="content">
+                <table class="main" width="100%" cellpadding="0" cellspacing="0">
+                    <tbody><tr>
+                        <td class="content-wrap aligncenter">
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tbody><tr>
+                                    <td class="content-block">
+                                        <h2>Чек на покупку</h2>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="content-block">
+                                        <table class="invoice">
+                                            <tbody><tr>
+                                                <td>Имя Фамилия<br>Номер заказа<br>{{ date }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <table class="invoice-items" cellpadding="0" cellspacing="0">
+                                                        <tbody>
+                                                        {% for item in items %}
+                                                        <tr>
+                                                            <td>{{ item.title}}</td>
+                                                            <td>{{ item.price }} x {{ item.count }}</td>
+                                                            <td class="alignright">= {{ item.common_price }}</td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                        <tr class="total" width="100%">
+                                                            <td class="alignright"></td>
+                                                            <td class="alignright" width="80%">Итого</td>
+                                                            <td class="alignright">{{ full_price }}</td>
+                                                        </tr>
+                                                    </tbody></table>
+                                                </td>
+                                            </tr>
+                                        </tbody></table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="content-block">
+                                        ООО "Компания"
+                                    </td>
+                                </tr>
+                            </tbody></table>
+                        </td>
+                    </tr>
+                </tbody></table>
+                </div>
+        </td>
+        <td></td>
+    </tr>
+</tbody></table>
+</body>
+</html>

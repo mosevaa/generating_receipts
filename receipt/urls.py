@@ -17,6 +17,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from generating_app.views import ItemView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('cash_machine', ItemView.as_view())
 ]
