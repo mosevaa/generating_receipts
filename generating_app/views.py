@@ -1,8 +1,12 @@
 import jinja2
 import pdfkit
+import qrcode
 
+from io import BytesIO
 from datetime import datetime
-from rest_framework.response import Response
+
+from django.http import HttpResponse
+from django.contrib.sites.shortcuts import get_current_site
 from rest_framework.views import APIView
 
 from generating_app.models import Item
@@ -30,14 +34,18 @@ def generate_pdf(items_from_db, counts):
         date=datetime.now().strftime("%d.%m.%Y %H:%M"),
         full_price=full_price
     )
+    output_path = f'media/{int(datetime.now().timestamp())}.pdf'
     pdfkit.from_string(rendered_page,
-                       output_path=f'media\\{int(datetime.now().timestamp())}.pdf',
-                       css='templates\\styles.css',
+                       output_path=output_path,
+                       css='templates/styles.css',
                        options={"enable-local-file-access": ""})
+    return output_path
 
 
 class ItemView(APIView):
     def post(self, request):
+        base_url = "{0}://{1}/".format(request.scheme, request.get_host())
+
         counts = {}
         for item_id in request.data['item']:
             if item_id not in counts.keys():
@@ -45,6 +53,23 @@ class ItemView(APIView):
             counts[item_id] += 1
         items_from_db = Item.objects.filter(id__in=request.data['item'])
 
-        generate_pdf(items_from_db, counts)
-        return Response([])
+        path = generate_pdf(items_from_db, counts)
+
+        qr = qrcode.QRCode(
+            version=2,
+            error_correction=qrcode.constants.ERROR_CORRECT_H,
+            box_size=4,
+            border=0,
+        )
+
+        qr.add_data(base_url + path)
+        qr.make(fit=True)
+
+        img = qr.make_image()
+
+        buffer = BytesIO()
+        img.save(buffer)
+
+        return HttpResponse(buffer.getbuffer(), content_type="image/png")
+
 
